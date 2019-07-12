@@ -1,5 +1,8 @@
 const express = require('express')
 const app = express()
+const bodyParser = require('body-parser')
+
+app.use(bodyParser.json())
 
 let persons = [
     {
@@ -29,18 +32,22 @@ let persons = [
     }
 ]
 
+// Homepage
 app.get('/', (req, res) => {
     res.send('<h1>Phonebook</h1>')
 })
 
+// Display all contacts
 app.get('/persons', (req, res) => {
     res.json(persons)
 })
 
+// Display total contacts 
 app.get('/info', (req, res) => {
     res.send('Phonebook has info for ' + persons.length + ' people <br></br>' + (new Date).toUTCString())
 })
 
+// Display contact by id
 app.get('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     const person = persons.find(person => person.id === id)
@@ -52,11 +59,45 @@ app.get('/api/persons/:id', (request, response) => {
     }    
 })
 
+// Delete Contact
 app.delete('/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     persons = persons.filter(person => person.id !== id)
 
     response.status(204).end()
+})
+
+// Generate Contact Id
+const generateId = () => {
+    return Math.floor(Math.random()*Math.floor(1000000))
+}
+// Add Contact
+app.post('/persons', (request, response) => {
+    const body = request.body
+    const matchName = persons.filter(p => p.name.toLowerCase() === body.name.toLowerCase()) 
+    
+    if (!body.name) {
+        return response.status(400).json({
+            error: 'missing name'
+        })
+    } else if (!body.number) {
+        return response.status(400).json({
+            error: 'missing number'
+        })
+    } else if (matchName.length > 0) {
+        return response.status(400).json({
+            error: 'name must be unique'
+        })
+    }
+
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: generateId(),
+    }
+    persons = persons.concat(person)
+    
+    response.json(person)
 })
 
 const port = 3001
