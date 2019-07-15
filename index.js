@@ -1,8 +1,17 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+const morgan = require('morgan')
 
 app.use(bodyParser.json())
+
+// Morgan middleware
+morgan.token('contact', function (req, res) {return JSON.stringify(req.body) })
+morgan.token('method', function (req, res) {return req.method})
+morgan.token('url', function (req, res) {return req.url})
+morgan.token('status', function(req, res) {return res.statusCode})
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :contact '))
 
 let persons = [
     {
@@ -60,7 +69,7 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 // Delete Contact
-app.delete('/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     persons = persons.filter(person => person.id !== id)
 
@@ -72,7 +81,7 @@ const generateId = () => {
     return Math.floor(Math.random()*Math.floor(1000000))
 }
 // Add Contact
-app.post('/persons', (request, response) => {
+app.post('/api/persons', (request, response) => {
     const body = request.body
     const matchName = persons.filter(p => p.name.toLowerCase() === body.name.toLowerCase()) 
     
