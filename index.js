@@ -2,16 +2,17 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
+const cors = require('cors')
 
 app.use(bodyParser.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :contact '))
+app.use(cors())
 
 // Morgan middleware
 morgan.token('contact', function (req, res) {return JSON.stringify(req.body) })
 morgan.token('method', function (req, res) {return req.method})
 morgan.token('url', function (req, res) {return req.url})
 morgan.token('status', function(req, res) {return res.statusCode})
-
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :contact '))
 
 let persons = [
     {
