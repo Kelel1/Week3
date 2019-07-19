@@ -50,7 +50,7 @@ app.get('/', (req, res) => {
 })
 
 // Display all contacts
-app.get('/persons', (req, res) => {
+app.get('/api/persons', (req, res) => {
     res.json(persons)
 })
 
