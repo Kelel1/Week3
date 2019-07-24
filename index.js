@@ -35,6 +35,7 @@ app.get('/api/persons', (req, res) => {
 app.get('/api/info', (request, response) => {
     Person.collection.countDocuments({}, function(error, count) {
         response.send(`Phonebook has info for ${count} people <br></br>` + (new Date).toUTCString())
+        .catch(error => next(error))
     })   
 })
 
